@@ -12,6 +12,14 @@ RSpec.describe GameQuestion, type: :model do
 
   # группа тестов на игровое состояние объекта вопроса
   context 'game status' do
+    it 'correct .text' do
+      expect(game_question.text).to eq(game_question.question.text)
+    end
+
+    it 'correct .level' do
+      expect(game_question.level).to eq(game_question.question.level)
+    end
+
     # тест на правильную генерацию хэша с вариантами
     it 'correct .variants' do
       expect(game_question.variants).to eq({'a' => game_question.question.answer2,

@@ -38,6 +38,51 @@ RSpec.describe Game, type: :model do
     end
   end
 
+  context 'game methods' do
+    it 'take_money! finishes the game' do
+      user_current_money = game_w_questions.user.balance
+      q = game_w_questions.current_game_question
+      game_w_questions.answer_current_question!(q.correct_answer_key)
+      game_w_questions.take_money!
+      expect(game_w_questions.prize).to be > 0
+      expect(game_w_questions.user.balance).to eq(user_current_money + game_w_questions.prize)
+      expect(game_w_questions.finished?).to be_truthy
+    end
+
+    context 'status' do
+      it 'returns :fail' do
+        q = game_w_questions.current_game_question
+        incorrect_answer_key = (['a', 'b', 'c', 'd'] - [q.correct_answer_key]).sample
+        game_w_questions.answer_current_question!(incorrect_answer_key)
+        expect(game_w_questions.status).to eq :fail
+      end
+
+      it 'returns :timeout' do
+        game_w_questions.created_at -= Game::TIME_LIMIT
+        game_w_questions.save!
+        game_w_questions.time_out!
+        expect(game_w_questions.status).to eq :timeout
+      end
+
+      it 'returns :won' do
+        15.times do
+          q = game_w_questions.current_game_question
+          game_w_questions.answer_current_question!(q.correct_answer_key)
+        end
+        expect(game_w_questions.status).to eq :won
+      end
+
+      it 'returns :money' do
+        10.times do
+          q = game_w_questions.current_game_question
+          game_w_questions.answer_current_question!(q.correct_answer_key)
+        end
+        game_w_questions.take_money!
+        expect(game_w_questions.status).to eq :money
+      end
+    end
+  end
+
 
   # тесты на основную игровую логику
   context 'game mechanics' do
