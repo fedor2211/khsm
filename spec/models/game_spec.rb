@@ -39,14 +39,16 @@ RSpec.describe Game, type: :model do
   end
 
   context 'game methods' do
-    it 'take_money! finishes the game' do
-      user_current_money = game_w_questions.user.balance
-      q = game_w_questions.current_game_question
-      game_w_questions.answer_current_question!(q.correct_answer_key)
-      game_w_questions.take_money!
-      expect(game_w_questions.prize).to be > 0
-      expect(game_w_questions.user.balance).to eq(user_current_money + game_w_questions.prize)
-      expect(game_w_questions.finished?).to be_truthy
+    context 'take_money!' do
+      it 'finishes the game' do
+        user_current_money = game_w_questions.user.balance
+        q = game_w_questions.current_game_question
+        game_w_questions.answer_current_question!(q.correct_answer_key)
+        game_w_questions.take_money!
+        expect(game_w_questions.prize).to be > 0
+        expect(game_w_questions.user.balance).to eq(user_current_money + game_w_questions.prize)
+        expect(game_w_questions.finished?).to be_truthy
+      end
     end
 
     context 'status' do
@@ -97,6 +99,42 @@ RSpec.describe Game, type: :model do
         q = game_w_questions.current_game_question
         game_w_questions.answer_current_question!(q.correct_answer_key)
         expect(game_w_questions.previous_level).to eq 0
+      end
+    end
+
+    context 'answer_current_question! correct' do
+      it 'returns true and continues game' do
+        q = game_w_questions.current_game_question
+        expect(game_w_questions.answer_current_question!(q.correct_answer_key)).to be_truthy
+        expect(game_w_questions.status).to eq(:in_progress)
+      end
+    end
+
+    context 'answer_current_question! correct last' do
+      it 'returns true and makes game won' do
+        game_w_questions.current_level = 14
+        q = game_w_questions.current_game_question
+        expect(game_w_questions.answer_current_question!(q.correct_answer_key)).to be_truthy
+        expect(game_w_questions.status).to eq(:won)
+      end
+    end
+
+    context 'answer_current_question! incorrect' do
+      it 'returns false and fails game' do
+        q = game_w_questions.current_game_question
+        incorrect_answer_key = (['a', 'b', 'c', 'd'] - [q.correct_answer_key]).sample
+        expect(game_w_questions.answer_current_question!(incorrect_answer_key)).to be_falsey
+        expect(game_w_questions.status).to eq(:fail)
+      end
+    end
+
+    context 'answer_current_question! timeout' do
+      it 'returns false and timeouts game' do
+        game_w_questions.created_at -= Game::TIME_LIMIT
+        game_w_questions.save!
+        q = game_w_questions.current_game_question
+        expect(game_w_questions.answer_current_question!(q.correct_answer_key)).to be_falsey
+        expect(game_w_questions.status).to eq(:timeout)
       end
     end
   end
