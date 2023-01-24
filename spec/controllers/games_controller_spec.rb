@@ -161,7 +161,7 @@ RSpec.describe GamesController, type: :controller do
         let(:game) { assigns(:game) }
 
         it 'does not finish game' do
-          expect(game.finished?).to be_falsey
+          expect(game.finished?).to eq false
         end
 
         it 'redirects to current_game' do
@@ -169,7 +169,7 @@ RSpec.describe GamesController, type: :controller do
         end
 
         it 'does not create flash messages' do
-          expect(flash.empty?).to be_truthy
+          expect(flash.empty?).to eq true
         end
       end
 
@@ -181,7 +181,7 @@ RSpec.describe GamesController, type: :controller do
         let(:game) { assigns(:game) }
 
         it 'finishes game' do
-          expect(game.finished?).to be_truthy
+          expect(game.finished?).to eq true
         end
 
         it 'fails game' do
@@ -227,7 +227,7 @@ RSpec.describe GamesController, type: :controller do
         let(:game) { assigns(:game) }
 
         it 'finishes game' do
-          expect(game.finished?).to be_truthy
+          expect(game.finished?).to eq true
         end
 
         it 'correctly calculates game prize' do
@@ -270,11 +270,11 @@ RSpec.describe GamesController, type: :controller do
         let(:game) { assigns(:game) }
 
         it 'does not finish game' do
-          expect(game.finished?).to be_falsey
+          expect(game.finished?).to eq false
         end
 
         it 'remembers audience help is used' do
-          expect(game.audience_help_used).to be_truthy
+          expect(game.audience_help_used).to eq true
         end
 
         it 'fills audience help help_hash' do
@@ -295,11 +295,11 @@ RSpec.describe GamesController, type: :controller do
         let(:game) { assigns(:game) }
 
         it 'does not finish game' do
-          expect(game.finished?).to be_falsey
+          expect(game.finished?).to eq false
         end
 
         it 'remembers fifty_fifty is used' do
-          expect(game.fifty_fifty_used).to be_truthy
+          expect(game.fifty_fifty_used).to eq true
         end
 
         it 'fills fifty_fifty help_hash' do
@@ -329,7 +329,7 @@ RSpec.describe GamesController, type: :controller do
         let(:game) { assigns(:game) }
 
         it 'does not finish game' do
-          expect(game.finished?).to be_falsey
+          expect(game.finished?).to eq false
         end
 
         it 'redirects to current game' do

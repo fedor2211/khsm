@@ -2,12 +2,7 @@
 
 require 'rails_helper'
 
-# Тестовый сценарий для модели игрового вопроса,
-# в идеале весь наш функционал (все методы) должны быть протестированы.
 RSpec.describe GameQuestion, type: :model do
-
-  # задаем локальную переменную game_question, доступную во всех тестах этого сценария
-  # она будет создана на фабрике заново для каждого блока it, где она вызывается
   let(:game_question) { FactoryBot.create(:game_question, a: 2, b: 1, c: 4, d: 3) }
 
   describe '#text' do
@@ -41,24 +36,16 @@ RSpec.describe GameQuestion, type: :model do
   describe '#answer_correct?' do
     context 'when answer is correct' do
       it 'returns true' do
-        expect(game_question.answer_correct?('b')).to be_truthy
+        expect(game_question.answer_correct?('b')).to eq true
       end
     end
 
     context 'when answer is incorrect' do
       it 'returns false' do
-        expect(game_question.answer_correct?('a')).to be_falsey
+        expect(game_question.answer_correct?('a')).to eq false
       end
     end
   end
-
-  # help_hash у нас имеет такой формат:
-  # {
-  #   fifty_fifty: ['a', 'b'], # При использовании подсказски остались варианты a и b
-  #   audience_help: {'a' => 42, 'c' => 37 ...}, # Распределение голосов по вариантам a, b, c, d
-  #   friend_call: 'Василий Петрович считает, что правильный ответ A'
-  # }
-  #
 
   describe '#add_audience_help' do
     before { game_question.add_audience_help }
