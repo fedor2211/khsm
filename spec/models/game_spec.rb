@@ -14,8 +14,8 @@ RSpec.describe Game, type: :model do
   let(:game_w_questions) { FactoryBot.create(:game_with_questions, user: user) }
 
   # Группа тестов на работу фабрики создания новых игр
-  context 'Game Factory' do
-    it 'Game.create_game! new correct game' do
+  describe '.create_game!' do
+    it 'creates new correct game' do
       # генерим 60 вопросов с 4х запасом по полю level,
       # чтобы проверить работу RANDOM при создании игры
       generate_questions(60)
