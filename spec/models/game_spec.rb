@@ -38,43 +38,49 @@ RSpec.describe Game, type: :model do
     end
   end
 
-  context 'game methods' do
-    context '#take_money!' do
-      it 'finishes the game' do
-        user_current_money = game_w_questions.user.balance
-        q = game_w_questions.current_game_question
-        game_w_questions.answer_current_question!(q.correct_answer_key)
-        game_w_questions.take_money!
-        expect(game_w_questions.prize).to be > 0
-        expect(game_w_questions.user.balance).to eq(user_current_money + game_w_questions.prize)
-        expect(game_w_questions.finished?).to be_truthy
-      end
+  describe '#take_money!' do
+    it 'finishes the game' do
+      user_current_money = game_w_questions.user.balance
+      q = game_w_questions.current_game_question
+      game_w_questions.answer_current_question!(q.correct_answer_key)
+      game_w_questions.take_money!
+      expect(game_w_questions.prize).to be > 0
+      expect(game_w_questions.user.balance).to eq(user_current_money + game_w_questions.prize)
+      expect(game_w_questions.finished?).to be_truthy
     end
+  end
 
-    context '#status' do
-      it 'when game failed' do
+  describe '#status' do
+    context 'when game failed' do
+      it 'returns :fail' do
         q = game_w_questions.current_game_question
         incorrect_answer_key = (['a', 'b', 'c', 'd'] - [q.correct_answer_key]).sample
         game_w_questions.answer_current_question!(incorrect_answer_key)
         expect(game_w_questions.status).to eq :fail
       end
+    end
 
-      it 'when timeout reached' do
+    context 'when timeout reached' do
+      it 'returns :timeout' do
         game_w_questions.created_at -= Game::TIME_LIMIT
         game_w_questions.save!
         game_w_questions.time_out!
         expect(game_w_questions.status).to eq :timeout
       end
+    end
 
-      it 'when game won' do
+    context 'when game won' do
+      it 'returns :won' do
         15.times do
           q = game_w_questions.current_game_question
           game_w_questions.answer_current_question!(q.correct_answer_key)
         end
         expect(game_w_questions.status).to eq :won
       end
+    end
 
-      it 'when money taken before win' do
+    context 'when money taken before win' do
+      it 'returns :money' do
         10.times do
           q = game_w_questions.current_game_question
           game_w_questions.answer_current_question!(q.correct_answer_key)
@@ -84,51 +90,55 @@ RSpec.describe Game, type: :model do
       end
     end
 
-    context '#current_game_question' do
+    describe '#current_game_question' do
       it 'returns question with current level' do
-        expect(game_w_questions.current_game_question.level).to eq game_w_questions.current_level
+        expect(game_w_questions.current_game_question).to eq game_w_questions.game_questions[0]
       end
     end
 
-    context '#previous_level' do
-      it 'returns -1' do
-        expect(game_w_questions.previous_level).to eq -1
-      end
-
-      it 'returns 0' do
-        q = game_w_questions.current_game_question
-        game_w_questions.answer_current_question!(q.correct_answer_key)
-        expect(game_w_questions.previous_level).to eq 0
+    describe '#previous_level' do
+      context 'when current level 0' do
+        it 'returns -1' do
+          expect(game_w_questions.previous_level).to eq -1
+        end
       end
     end
 
-    context '#answer_current_question!' do
-      it 'when answer correct' do
-        q = game_w_questions.current_game_question
-        expect(game_w_questions.answer_current_question!(q.correct_answer_key)).to be_truthy
-        expect(game_w_questions.status).to eq(:in_progress)
+    describe '#answer_current_question!' do
+      context 'when answer correct' do
+        it 'returns false' do
+          q = game_w_questions.current_game_question
+          expect(game_w_questions.answer_current_question!(q.correct_answer_key)).to be_truthy
+          expect(game_w_questions.status).to eq(:in_progress)
+        end
       end
 
-      it 'when answer correct and last' do
-        game_w_questions.current_level = 14
-        q = game_w_questions.current_game_question
-        expect(game_w_questions.answer_current_question!(q.correct_answer_key)).to be_truthy
-        expect(game_w_questions.status).to eq(:won)
+      context 'when answer correct and last' do
+        it 'returns true and makes game won' do
+          game_w_questions.current_level = 14
+          q = game_w_questions.current_game_question
+          expect(game_w_questions.answer_current_question!(q.correct_answer_key)).to be_truthy
+          expect(game_w_questions.status).to eq(:won)
+        end
       end
 
-      it 'when answer incorrect' do
-        q = game_w_questions.current_game_question
-        incorrect_answer_key = (['a', 'b', 'c', 'd'] - [q.correct_answer_key]).sample
-        expect(game_w_questions.answer_current_question!(incorrect_answer_key)).to be_falsey
-        expect(game_w_questions.status).to eq(:fail)
+      context 'when answer incorrect' do
+        it 'returns false and fails game' do
+          q = game_w_questions.current_game_question
+          incorrect_answer_key = (['a', 'b', 'c', 'd'] - [q.correct_answer_key]).sample
+          expect(game_w_questions.answer_current_question!(incorrect_answer_key)).to be_falsey
+          expect(game_w_questions.status).to eq(:fail)
+        end
       end
 
-      it 'when timeout reached' do
-        game_w_questions.created_at -= Game::TIME_LIMIT
-        game_w_questions.save!
-        q = game_w_questions.current_game_question
-        expect(game_w_questions.answer_current_question!(q.correct_answer_key)).to be_falsey
-        expect(game_w_questions.status).to eq(:timeout)
+      context 'when timeout reached' do
+        it 'returns false and times out game' do
+          game_w_questions.created_at -= Game::TIME_LIMIT
+          game_w_questions.save!
+          q = game_w_questions.current_game_question
+          expect(game_w_questions.answer_current_question!(q.correct_answer_key)).to be_falsey
+          expect(game_w_questions.status).to eq(:timeout)
+        end
       end
     end
   end
