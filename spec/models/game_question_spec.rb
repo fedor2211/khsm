@@ -79,6 +79,10 @@ RSpec.describe GameQuestion, type: :model do
     it 'entry string is not empty' do
       expect(game_question.help_hash[:friend_call]).not_to be_empty
     end
+
+    it 'contains answer variant' do
+      expect(game_question.help_hash[:friend_call]).to match(/[A-D]\Z/)
+    end
   end
 
   describe '#add_fifty_fifty' do
