@@ -5,13 +5,8 @@ RSpec.feature 'USER views not own profile', type: :feature do
   before do
     generate_questions(30)
   end
-  let(:user) { FactoryBot.create(:user) }
-  let(:games) do
-    [
-      FactoryBot.create(:game_with_questions, user: user),
-      FactoryBot.create(:game_with_questions, user: user)
-    ]
-  end
+  let(:user) { create(:user) }
+  let(:games) { create_pair(:game_with_questions, user: user }
 
   scenario 'successfully' do
     games[0].current_level = 10

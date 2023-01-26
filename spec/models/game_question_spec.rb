@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe GameQuestion, type: :model do
-  let(:game_question) { FactoryBot.create(:game_question, a: 2, b: 1, c: 4, d: 3) }
+  let(:game_question) { create(:game_question, a: 2, b: 1, c: 4, d: 3) }
 
   describe '#text' do
     it 'returns question text' do

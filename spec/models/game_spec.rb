@@ -4,8 +4,8 @@ require 'rails_helper'
 require 'support/my_spec_helper'
 
 RSpec.describe Game, type: :model do
-  let(:user) { FactoryBot.create(:user) }
-  let(:game_w_questions) { FactoryBot.create(:game_with_questions, user: user) }
+  let(:user) { create(:user) }
+  let(:game_w_questions) { create(:game_with_questions, user: user) }
 
   describe '.create_game!' do
     before do
@@ -150,8 +150,9 @@ RSpec.describe Game, type: :model do
 
       context 'when answer incorrect' do
         let!(:answer_key) do
-          (['a', 'b', 'c', 'd'] -
-           [game_w_questions.current_game_question.correct_answer_key]).sample
+          %w[a b c d]
+            .grep_v(game_w_questions.current_game_question.correct_answer_key)
+            .sample
         end
         before { game_w_questions.answer_current_question!(answer_key) }
 
@@ -165,10 +166,7 @@ RSpec.describe Game, type: :model do
       end
 
       context 'when timeout reached' do
-        let!(:answer_key) do
-          (['a', 'b', 'c', 'd'] -
-           [game_w_questions.current_game_question.correct_answer_key]).sample
-        end
+        let!(:answer_key) { game_w_questions.current_game_question.correct_answer_key }
         before do
           game_w_questions.created_at -= Game::TIME_LIMIT
           game_w_questions.save!

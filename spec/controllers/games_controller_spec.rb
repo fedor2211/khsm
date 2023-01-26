@@ -10,9 +10,9 @@ require 'support/my_spec_helper' # наш собственный класс с �
 #   3. на передачу граничных/неправильных данных в попытке сломать контроллер
 #
 RSpec.describe GamesController, type: :controller do
-  let(:user) { FactoryBot.create(:user) }
-  let(:admin) { FactoryBot.create(:user, is_admin: true) }
-  let(:game_w_questions) { FactoryBot.create(:game_with_questions, user: user) }
+  let(:user) { create(:user) }
+  let(:admin) { create(:user, is_admin: true) }
+  let(:game_w_questions) { create(:game_with_questions, user: user) }
 
   describe '#show' do
     context 'when not logged in' do
@@ -53,7 +53,7 @@ RSpec.describe GamesController, type: :controller do
 
       context 'and try to show other user game' do
         before do
-          new_game = FactoryBot.create(:game_with_questions)
+          new_game = create(:game_with_questions)
           get :show, id: new_game.id
         end
 

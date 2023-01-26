@@ -1,13 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe 'users/show', type: :view do
-  let(:user) { FactoryBot.create(:user, name: "FooUser", balance: 4000) }
+  let(:user) { create(:user, name: "FooUser", balance: 4000) }
   before do
     assign(:user, user)
-    assign(
-      :games,
-      [FactoryBot.build_stubbed(:game), FactoryBot.build_stubbed(:game)]
-    )
+    assign( :games, build_pair(:game))
     stub_template('users/_game.html.erb' => 'User game stub.')
     render
   end
