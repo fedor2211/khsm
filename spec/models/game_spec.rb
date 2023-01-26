@@ -61,7 +61,10 @@ RSpec.describe Game, type: :model do
     context 'when game failed' do
       it 'returns :fail' do
         q = game_w_questions.current_game_question
-        incorrect_answer_key = (['a', 'b', 'c', 'd'] - [q.correct_answer_key]).sample
+        incorrect_answer_key =
+          %w[a b c d]
+            .grep_v(game_w_questions.current_game_question.correct_answer_key)
+            .sample
         game_w_questions.answer_current_question!(incorrect_answer_key)
         expect(game_w_questions.status).to eq :fail
       end
